@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cotizador de espejos — Prusia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --acento:       #7c4b4b;
+      --acento-suave: #f5edec;
+      --fondo:        #eeeeee;
+      --card:         #ffffff;
+      --borde:        #ddd;
+      --texto:        #2a2a2a;
+      --texto-sec:    #666;
+      --texto-ter:    #aaa;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =====================
+       HEADER
+       ===================== */
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--borde);
+      padding: 0 2rem;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-logo img {
+      height: 40px;
+      display: block;
+    }
+
+    .header-volver {
+      font-size: 13px;
+      color: var(--texto-sec);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.15s;
+    }
+    .header-volver:hover { color: var(--acento); }
+    .header-volver svg {
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* =====================
+       HERO
+       ===================== */
+    .hero {
+      background: var(--card);
+      border-bottom: 1px solid var(--borde);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--acento);
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--texto);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: var(--texto-sec);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* =====================
+       CONTENIDO PRINCIPAL
+       ===================== */
+    main {
+      flex: 1;
+      padding: 2.5rem 1rem;
+    }
+
+    .cotizador {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 4px;
+      padding: 2.25rem 2rem;
+      border: 1px solid var(--borde);
+    }
+
+    .cot-intro {
+      font-size: 14px;
+      color: var(--texto-sec);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #f0e8e8;
+      line-height: 1.6;
+    }
+
+    .cot-seccion { margin-bottom: 1.5rem; }
+
+    .cot-etiqueta {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--acento);
+      margin-bottom: 9px;
+    }
+
+    .cot-opciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cot-opcion {
+      font-family: 'Inter', sans-serif;
+      background: var(--card);
+      border: 1px solid var(--borde);
+      border-radius: 4px;
+      padding: 8px 15px;
+      font-size: 14px;
+      color: var(--texto);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cot-opcion:hover:not(:disabled) {
+      background: var(--acento-suave);
+      border-color: var(--acento);
+      color: var(--acento);
+    }
+    .cot-opcion.activo {
+      background: var(--acento-suave);
+      border: 1.5px solid var(--acento);
+      color: var(--acento);
+      font-weight: 600;
+    }
+    .cot-opcion:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      background: #f5f5f5;
+      border-color: #e5e5e5;
+      color: #bbb;
+    }
+
+    .cot-seccion.bloqueada .cot-etiqueta { color: #ccc; }
+    .cot-seccion.bloqueada .cot-opcion {
+      opacity: 0.25;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .separador {
+      border: none;
+      border-top: 1px solid #f0e8e8;
+      margin: 1.75rem 0;
+    }
+
+    .cot-resumen {
+      background: var(--acento-suave);
+      border-radius: 4px;
+      border-left: 3px solid var(--acento);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+    .resumen-titulo {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--acento);
+      margin-bottom: 10px;
+    }
+    .resumen-fila {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 4px 0;
+      color: var(--texto-sec);
+    }
+    .resumen-fila span:last-child {
+      color: var(--texto);
+      font-weight: 600;
+    }
+
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 14px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .btn-whatsapp:hover { background: #1EBD5A; }
+    .btn-whatsapp:disabled {
+      background: #ccc;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    .btn-whatsapp svg {
+      width: 20px; height: 20px;
+      fill: #fff; flex-shrink: 0;
+    }
+
+    .cot-nota {
+      font-size: 12px;
+      color: var(--texto-ter);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* =====================
+       FOOTER
+       ===================== */
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--borde);
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--texto-sec);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: var(--acento); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--texto-ter);
+    }
+
+    /* =====================
+       RESPONSIVE
+       ===================== */
+    @media (max-width: 500px) {
+      header { padding: 0 1rem; }
+      .hero { padding: 2rem 1rem 1.75rem; }
+      .hero h1 { font-size: 26px; }
+      .cotizador { padding: 1.5rem 1rem; }
+      .footer-links { gap: 1rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- =====================
+       HEADER
+       ===================== -->
+  <header>
+
+    <!-- LOGO   -->
+    <a href="https://prusiadesign.com/" class="header-logo"><img src="logo-1087867754-1711291991-f7eb8a9d2a8b8a58da8b5a6e1131d7981711291991-480-0.webp" alt="Prusia"></a>
+
+    <a href="https://prusiadesign.com/" class="header-volver">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver a la tienda
+    </a>
+
+  </header>
+
+
+  <!-- =====================
+       HERO
+       ===================== -->
+  <div class="hero">
+    <p class="hero-eyebrow">Pedido personalizado</p>
+    <h1>Cotizá tu espejo a medida</h1>
+    <p>Elegí el modelo, borde, medidas e iluminación. Al terminar te generamos un mensaje listo para enviarnos por WhatsApp.</p>
+  </div>
+
+
+  <!-- =====================
+       COTIZADOR
+       ===================== -->
+  <main>
+    <div class="cotizador">
+
+      <p class="cot-intro">
+        Seleccioná cada opción en orden. Las opciones incompatibles se desactivan automáticamente
+        según el modelo que elijas.
+      </p>
+
+      <div class="cot-seccion" id="sec-modelo">
+        <div class="cot-etiqueta">Modelo</div>
+        <div class="cot-opciones" id="opt-modelo"></div>
+      </div>
+
+      <div class="cot-seccion bloqueada" id="sec-borde">
+        <div class="cot-etiqueta">Borde</div>
+        <div class="cot-opciones" id="opt-borde"></div>
+      </div>
+
+      <div class="cot-seccion bloqueada" id="sec-tam">
+        <div class="cot-etiqueta">Medidas</div>
+        <div class="cot-opciones" id="opt-tam"></div>
+      </div>
+
+      <div class="cot-seccion bloqueada" id="sec-luz">
+        <div class="cot-etiqueta">Iluminación</div>
+        <div class="cot-opciones" id="opt-luz"></div>
+      </div>
+
+      <hr class="separador" />
+
+      <div class="cot-resumen" id="resumen">
+        <div class="resumen-titulo">Tu selección</div>
+        <div id="resumen-filas"></div>
+      </div>
+
+      <button class="btn-whatsapp" id="btn-wa" disabled>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Consultar por WhatsApp
+      </button>
+      <p class="cot-nota" id="nota">Empezá eligiendo el modelo</p>
+
+    </div>
+  </main>
+
+
+  <!-- =====================
+       FOOTER
+       ===================== -->
+  <footer>
+    <div class="footer-links">
+      <!-- Reemplazá los # con las URLs reales de tu tienda -->
+      <a href="https://prusiadesign.com/">Tienda</a>
+      <a href="https://prusiadesign.com/productos/">Productos</a>
+      <a href="https://prusiadesign.com/contacto/">Contacto</a>
+      <a href="https://www.instagram.com/prusiadesign" target="_blank">Instagram</a>
+    </div>
+    <p class="footer-copy">© 2025 Prusia. Todos los derechos reservados.</p>
+  </footer>
+
+
+  <script>
+  const NUMERO_WA = "5491130191403"; 
+
+  const COMBINACIONES = [
+    ["Capilla","Pulido","120x50cm","Sin Luz"],
+    ["Capilla","Pulido","120x50cm","LED Blanco"],
+    ["Capilla","Pulido","120x50cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","120x50cm","LED RGB"],
+    ["Capilla","Pulido","140x60cm","Sin Luz"],
+    ["Capilla","Pulido","140x60cm","LED Blanco"],
+    ["Capilla","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","140x60cm","LED RGB"],
+    ["Capilla","Pulido","150x50cm","Sin Luz"],
+    ["Capilla","Pulido","150x50cm","LED Blanco"],
+    ["Capilla","Pulido","150x50cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","150x50cm","LED RGB"],
+    ["Capilla","Pulido","170x60cm","Sin Luz"],
+    ["Capilla","Pulido","170x60cm","LED Blanco"],
+    ["Capilla","Pulido","170x60cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","170x60cm","LED RGB"],
+    ["Capilla","Pulido","180x70cm","Sin Luz"],
+    ["Capilla","Pulido","180x70cm","LED Blanco"],
+    ["Capilla","Pulido","180x70cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","180x70cm","LED RGB"],
+    ["Capilla","Pulido","180x80cm","Sin Luz"],
+    ["Capilla","Pulido","180x80cm","LED Blanco"],
+    ["Capilla","Pulido","180x80cm","LED Blanco Cálido"],
+    ["Capilla","Pulido","180x80cm","LED RGB"],
+    ["Capilla","PVC","120x50cm","Sin Luz"],
+    ["Capilla","PVC","120x50cm","LED Blanco"],
+    ["Capilla","PVC","120x50cm","LED Blanco Cálido"],
+    ["Capilla","PVC","120x50cm","LED RGB"],
+    ["Capilla","PVC","140x60cm","Sin Luz"],
+    ["Capilla","PVC","140x60cm","LED Blanco"],
+    ["Capilla","PVC","140x60cm","LED Blanco Cálido"],
+    ["Capilla","PVC","140x60cm","LED RGB"],
+    ["Capilla","PVC","150x50cm","Sin Luz"],
+    ["Capilla","PVC","150x50cm","LED Blanco"],
+    ["Capilla","PVC","150x50cm","LED Blanco Cálido"],
+    ["Capilla","PVC","150x50cm","LED RGB"],
+    ["Capilla","PVC","170x60cm","Sin Luz"],
+    ["Capilla","PVC","170x60cm","LED Blanco"],
+    ["Capilla","PVC","170x60cm","LED Blanco Cálido"],
+    ["Capilla","PVC","170x60cm","LED RGB"],
+    ["Capilla","PVC","180x70cm","Sin Luz"],
+    ["Capilla","PVC","180x70cm","LED Blanco"],
+    ["Capilla","PVC","180x70cm","LED Blanco Cálido"],
+    ["Capilla","PVC","180x70cm","LED RGB"],
+    ["Capilla","PVC","180x80cm","Sin Luz"],
+    ["Capilla","PVC","180x80cm","LED Blanco"],
+    ["Capilla","PVC","180x80cm","LED Blanco Cálido"],
+    ["Capilla","PVC","180x80cm","LED RGB"],
+    ["Capilla","Hierro","180x80cm","Sin Luz"],
+    ["Capilla","Pulido","120x60cm","Neón Frontal + Touch"],
+    ["Capilla","Pulido","140x60cm","Neón Frontal + Touch"],
+    ["Capilla","Pulido","160x60cm","Neón Frontal + Touch"],
+    ["Capilla","Pulido","170x60cm","Neón Frontal + Touch"],
+    ["Capilla","Pulido","180x60cm","Neón Frontal + Touch"],
+    ["Capilla","Pulido","180x70cm","Neón Frontal + Touch"],
+    ["Capilla con pie","Hierro","180x80cm","Sin Luz"],
+    ["Cápsula","Pulido","70x50cm","Sin Luz"],
+    ["Cápsula","Pulido","70x50cm","LED Blanco"],
+    ["Cápsula","Pulido","70x50cm","LED Blanco Cálido"],
+    ["Cápsula","Pulido","70x50cm","LED RGB"],
+    ["Cápsula","Pulido","120x50cm","Sin Luz"],
+    ["Cápsula","Pulido","120x50cm","LED Blanco"],
+    ["Cápsula","Pulido","120x50cm","LED Blanco Cálido"],
+    ["Cápsula","Pulido","120x50cm","LED RGB"],
+    ["Cápsula","Pulido","140x60cm","Sin Luz"],
+    ["Cápsula","Pulido","140x60cm","LED Blanco"],
+    ["Cápsula","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Cápsula","Pulido","140x60cm","LED RGB"],
+    ["Cápsula","Pulido","150x50cm","Sin Luz"],
+    ["Cápsula","Pulido","150x50cm","LED Blanco"],
+    ["Cápsula","Pulido","150x50cm","LED Blanco Cálido"],
+    ["Cápsula","Pulido","150x50cm","LED RGB"],
+    ["Cápsula","PVC","70x50cm","Sin Luz"],
+    ["Cápsula","PVC","70x50cm","LED Blanco"],
+    ["Cápsula","PVC","70x50cm","LED Blanco Cálido"],
+    ["Cápsula","PVC","70x50cm","LED RGB"],
+    ["Cápsula","PVC","120x50cm","Sin Luz"],
+    ["Cápsula","PVC","120x50cm","LED Blanco"],
+    ["Cápsula","PVC","120x50cm","LED Blanco Cálido"],
+    ["Cápsula","PVC","120x50cm","LED RGB"],
+    ["Cápsula","PVC","140x60cm","Sin Luz"],
+    ["Cápsula","PVC","140x60cm","LED Blanco"],
+    ["Cápsula","PVC","140x60cm","LED Blanco Cálido"],
+    ["Cápsula","PVC","140x60cm","LED RGB"],
+    ["Cápsula","PVC","150x50cm","Sin Luz"],
+    ["Cápsula","PVC","150x50cm","LED Blanco"],
+    ["Cápsula","PVC","150x50cm","LED Blanco Cálido"],
+    ["Cápsula","PVC","150x50cm","LED RGB"],
+    ["Cápsula","PVC","170x60cm","Sin Luz"],
+    ["Cápsula","PVC","170x60cm","LED Blanco"],
+    ["Cápsula","PVC","170x60cm","LED Blanco Cálido"],
+    ["Cápsula","PVC","170x60cm","LED RGB"],
+    ["Ventana","Hierro","150x60cm","Sin Luz"],
+    ["Ventana","Hierro","180x80cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","120x50cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","120x50cm","LED Blanco"],
+    ["Clásico Redondeado","Pulido","120x50cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","Pulido","120x50cm","LED RGB"],
+    ["Clásico Redondeado","Pulido","150x50cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","150x50cm","LED Blanco"],
+    ["Clásico Redondeado","Pulido","150x50cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","Pulido","150x50cm","LED RGB"],
+    ["Clásico Redondeado","Pulido","170x60cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","170x60cm","LED Blanco"],
+    ["Clásico Redondeado","Pulido","170x60cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","Pulido","170x60cm","LED RGB"],
+    ["Clásico Redondeado","Pulido","140x60cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","140x60cm","LED Blanco"],
+    ["Clásico Redondeado","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","Pulido","140x60cm","LED RGB"],
+    ["Clásico Redondeado","Pulido","180x70cm","Sin Luz"],
+    ["Clásico Redondeado","Pulido","180x70cm","LED Blanco"],
+    ["Clásico Redondeado","Pulido","180x70cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","Pulido","180x70cm","LED RGB"],
+    ["Clásico Redondeado","PVC","120x50cm","Sin Luz"],
+    ["Clásico Redondeado","PVC","120x50cm","LED Blanco"],
+    ["Clásico Redondeado","PVC","120x50cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","PVC","120x50cm","LED RGB"],
+    ["Clásico Redondeado","PVC","150x50cm","Sin Luz"],
+    ["Clásico Redondeado","PVC","150x50cm","LED Blanco"],
+    ["Clásico Redondeado","PVC","150x50cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","PVC","150x50cm","LED RGB"],
+    ["Clásico Redondeado","PVC","170x60cm","Sin Luz"],
+    ["Clásico Redondeado","PVC","170x60cm","LED Blanco"],
+    ["Clásico Redondeado","PVC","170x60cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","PVC","170x60cm","LED RGB"],
+    ["Clásico Redondeado","PVC","140x60cm","Sin Luz"],
+    ["Clásico Redondeado","PVC","140x60cm","LED Blanco"],
+    ["Clásico Redondeado","PVC","140x60cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","PVC","140x60cm","LED RGB"],
+    ["Clásico Redondeado","PVC","180x70cm","Sin Luz"],
+    ["Clásico Redondeado","PVC","180x70cm","LED Blanco"],
+    ["Clásico Redondeado","PVC","180x70cm","LED Blanco Cálido"],
+    ["Clásico Redondeado","PVC","180x70cm","LED RGB"],
+    ["Clásico Redondeado","Pulido","120x60cm","Neón Frontal + Touch"],
+    ["Clásico Redondeado","Pulido","140x60cm","Neón Frontal + Touch"],
+    ["Clásico Redondeado","Pulido","160x60cm","Neón Frontal + Touch"],
+    ["Clásico Redondeado","Pulido","170x60cm","Neón Frontal + Touch"],
+    ["Clásico Redondeado","Pulido","180x60cm","Neón Frontal + Touch"],
+    ["Clásico Redondeado","Pulido","180x70cm","Neón Frontal + Touch"],
+    ["Clásico","Pulido","70x50cm","Sin Luz"],
+    ["Clásico","Pulido","70x50cm","LED Blanco"],
+    ["Clásico","Pulido","70x50cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","70x50cm","LED RGB"],
+    ["Clásico","Pulido","120x50cm","Sin Luz"],
+    ["Clásico","Pulido","120x50cm","LED Blanco"],
+    ["Clásico","Pulido","120x50cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","120x50cm","LED RGB"],
+    ["Clásico","Pulido","140x60cm","Sin Luz"],
+    ["Clásico","Pulido","140x60cm","LED Blanco"],
+    ["Clásico","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","140x60cm","LED RGB"],
+    ["Clásico","Pulido","150x50cm","Sin Luz"],
+    ["Clásico","Pulido","150x50cm","LED Blanco"],
+    ["Clásico","Pulido","150x50cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","150x50cm","LED RGB"],
+    ["Clásico","Pulido","170x60cm","Sin Luz"],
+    ["Clásico","Pulido","170x60cm","LED Blanco"],
+    ["Clásico","Pulido","170x60cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","170x60cm","LED RGB"],
+    ["Clásico","Pulido","180x70cm","Sin Luz"],
+    ["Clásico","Pulido","180x70cm","LED Blanco"],
+    ["Clásico","Pulido","180x70cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","180x70cm","LED RGB"],
+    ["Clásico","Pulido","180x80cm","Sin Luz"],
+    ["Clásico","Pulido","180x80cm","LED Blanco"],
+    ["Clásico","Pulido","180x80cm","LED Blanco Cálido"],
+    ["Clásico","Pulido","180x80cm","LED RGB"],
+    ["Clásico","PVC","70x50cm","Sin Luz"],
+    ["Clásico","PVC","70x50cm","LED Blanco"],
+    ["Clásico","PVC","70x50cm","LED Blanco Cálido"],
+    ["Clásico","PVC","70x50cm","LED RGB"],
+    ["Clásico","PVC","120x50cm","Sin Luz"],
+    ["Clásico","PVC","120x50cm","LED Blanco"],
+    ["Clásico","PVC","120x50cm","LED Blanco Cálido"],
+    ["Clásico","PVC","120x50cm","LED RGB"],
+    ["Clásico","PVC","140x60cm","Sin Luz"],
+    ["Clásico","PVC","140x60cm","LED Blanco"],
+    ["Clásico","PVC","140x60cm","LED Blanco Cálido"],
+    ["Clásico","PVC","140x60cm","LED RGB"],
+    ["Clásico","PVC","150x50cm","Sin Luz"],
+    ["Clásico","PVC","150x50cm","LED Blanco"],
+    ["Clásico","PVC","150x50cm","LED Blanco Cálido"],
+    ["Clásico","PVC","150x50cm","LED RGB"],
+    ["Clásico","PVC","170x60cm","Sin Luz"],
+    ["Clásico","PVC","170x60cm","LED Blanco"],
+    ["Clásico","PVC","170x60cm","LED Blanco Cálido"],
+    ["Clásico","PVC","170x60cm","LED RGB"],
+    ["Clásico","PVC","180x70cm","Sin Luz"],
+    ["Clásico","PVC","180x70cm","LED Blanco"],
+    ["Clásico","PVC","180x70cm","LED Blanco Cálido"],
+    ["Clásico","PVC","180x70cm","LED RGB"],
+    ["Clásico","PVC","180x80cm","Sin Luz"],
+    ["Clásico","PVC","180x80cm","LED Blanco"],
+    ["Clásico","PVC","180x80cm","LED Blanco Cálido"],
+    ["Clásico","PVC","180x80cm","LED RGB"],
+    ["Oslo","Pulido","140x60cm","Sin Luz"],
+    ["Oslo","Pulido","140x60cm","LED Blanco"],
+    ["Oslo","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Oslo","Pulido","140x60cm","LED RGB"],
+    ["Oslo","Pulido","170x60cm","Sin Luz"],
+    ["Oslo","Pulido","170x60cm","LED Blanco"],
+    ["Oslo","Pulido","170x60cm","LED Blanco Cálido"],
+    ["Oslo","Pulido","170x60cm","LED RGB"],
+    ["Oslo","Pulido","180x60cm","Sin Luz"],
+    ["Oslo","Pulido","180x60cm","LED Blanco"],
+    ["Oslo","Pulido","180x60cm","LED Blanco Cálido"],
+    ["Oslo","Pulido","180x60cm","LED RGB"],
+    ["Oslo","Pulido","180x80cm","Sin Luz"],
+    ["Oslo","Pulido","180x80cm","LED Blanco"],
+    ["Oslo","Pulido","180x80cm","LED Blanco Cálido"],
+    ["Oslo","Pulido","180x80cm","LED RGB"],
+    ["Oslo","PVC","140x60cm","Sin Luz"],
+    ["Oslo","PVC","140x60cm","LED Blanco"],
+    ["Oslo","PVC","140x60cm","LED Blanco Cálido"],
+    ["Oslo","PVC","140x60cm","LED RGB"],
+    ["Oslo","PVC","170x60cm","Sin Luz"],
+    ["Oslo","PVC","170x60cm","LED Blanco"],
+    ["Oslo","PVC","170x60cm","LED Blanco Cálido"],
+    ["Oslo","PVC","170x60cm","LED RGB"],
+    ["Oslo","PVC","180x60cm","Sin Luz"],
+    ["Oslo","PVC","180x60cm","LED Blanco"],
+    ["Oslo","PVC","180x60cm","LED Blanco Cálido"],
+    ["Oslo","PVC","180x60cm","LED RGB"],
+    ["Oslo","PVC","180x80cm","Sin Luz"],
+    ["Oslo","PVC","180x80cm","LED Blanco"],
+    ["Oslo","PVC","180x80cm","LED Blanco Cálido"],
+    ["Oslo","PVC","180x80cm","LED RGB"],
+    ["Medialuna","Pulido","120x50cm","Sin Luz"],
+    ["Medialuna","Pulido","120x50cm","LED Blanco"],
+    ["Medialuna","Pulido","120x50cm","LED Blanco Cálido"],
+    ["Medialuna","Pulido","120x50cm","LED RGB"],
+    ["Medialuna","Pulido","140x60cm","Sin Luz"],
+    ["Medialuna","Pulido","140x60cm","LED Blanco"],
+    ["Medialuna","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Medialuna","Pulido","140x60cm","LED RGB"],
+    ["Medialuna","Pulido","160x70cm","Sin Luz"],
+    ["Medialuna","Pulido","160x70cm","LED Blanco"],
+    ["Medialuna","Pulido","160x70cm","LED Blanco Cálido"],
+    ["Medialuna","Pulido","160x70cm","LED RGB"],
+    ["Medialuna","PVC","120x50cm","Sin Luz"],
+    ["Medialuna","PVC","120x50cm","LED Blanco"],
+    ["Medialuna","PVC","120x50cm","LED Blanco Cálido"],
+    ["Medialuna","PVC","120x50cm","LED RGB"],
+    ["Medialuna","PVC","140x60cm","Sin Luz"],
+    ["Medialuna","PVC","140x60cm","LED Blanco"],
+    ["Medialuna","PVC","140x60cm","LED Blanco Cálido"],
+    ["Medialuna","PVC","140x60cm","LED RGB"],
+    ["Medialuna","PVC","160x70cm","Sin Luz"],
+    ["Medialuna","PVC","160x70cm","LED Blanco"],
+    ["Medialuna","PVC","160x70cm","LED Blanco Cálido"],
+    ["Medialuna","PVC","160x70cm","LED RGB"],
+    ["Ondas","Pulido","120x60cm","Sin Luz"],
+    ["Ondas","Pulido","120x60cm","LED Blanco"],
+    ["Ondas","Pulido","120x60cm","LED Blanco Cálido"],
+    ["Ondas","Pulido","120x60cm","LED RGB"],
+    ["Ondas","Pulido","140x60cm","Sin Luz"],
+    ["Ondas","Pulido","140x60cm","LED Blanco"],
+    ["Ondas","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Ondas","Pulido","140x60cm","LED RGB"],
+    ["Ondas","Pulido","160x80cm","Sin Luz"],
+    ["Ondas","Pulido","160x80cm","LED Blanco"],
+    ["Ondas","Pulido","160x80cm","LED Blanco Cálido"],
+    ["Ondas","Pulido","160x80cm","LED RGB"],
+    ["Ondas","PVC","120x60cm","Sin Luz"],
+    ["Ondas","PVC","120x60cm","LED Blanco"],
+    ["Ondas","PVC","120x60cm","LED Blanco Cálido"],
+    ["Ondas","PVC","120x60cm","LED RGB"],
+    ["Ondas","PVC","140x60cm","Sin Luz"],
+    ["Ondas","PVC","140x60cm","LED Blanco"],
+    ["Ondas","PVC","140x60cm","LED Blanco Cálido"],
+    ["Ondas","PVC","140x60cm","LED RGB"],
+    ["Ondas","PVC","160x80cm","Sin Luz"],
+    ["Ondas","PVC","160x80cm","LED Blanco"],
+    ["Ondas","PVC","160x80cm","LED Blanco Cálido"],
+    ["Ondas","PVC","160x80cm","LED RGB"],
+    ["Atenas","Pulido","80x60cm","Sin Luz"],
+    ["Atenas","Pulido","80x60cm","LED Blanco"],
+    ["Atenas","Pulido","80x60cm","LED Blanco Cálido"],
+    ["Atenas","Pulido","80x60cm","LED RGB"],
+    ["Atenas","Pulido","120x60cm","Sin Luz"],
+    ["Atenas","Pulido","120x60cm","LED Blanco"],
+    ["Atenas","Pulido","120x60cm","LED Blanco Cálido"],
+    ["Atenas","Pulido","120x60cm","LED RGB"],
+    ["Atenas","PVC","80x60cm","Sin Luz"],
+    ["Atenas","PVC","80x60cm","LED Blanco"],
+    ["Atenas","PVC","80x60cm","LED Blanco Cálido"],
+    ["Atenas","PVC","80x60cm","LED RGB"],
+    ["Atenas","PVC","120x60cm","Sin Luz"],
+    ["Atenas","PVC","120x60cm","LED Blanco"],
+    ["Atenas","PVC","120x60cm","LED Blanco Cálido"],
+    ["Atenas","PVC","120x60cm","LED RGB"],
+    ["Aura","Pulido","120x60cm","Sin Luz"],
+    ["Aura","Pulido","120x60cm","LED Blanco"],
+    ["Aura","Pulido","120x60cm","LED Blanco Cálido"],
+    ["Aura","Pulido","120x60cm","LED RGB"],
+    ["Aura","Pulido","140x60cm","Sin Luz"],
+    ["Aura","Pulido","140x60cm","LED Blanco"],
+    ["Aura","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Aura","Pulido","140x60cm","LED RGB"],
+    ["Aura","Pulido","160x60cm","Sin Luz"],
+    ["Aura","Pulido","160x60cm","LED Blanco"],
+    ["Aura","Pulido","160x60cm","LED Blanco Cálido"],
+    ["Aura","Pulido","160x60cm","LED RGB"],
+    ["Aura","Pulido","180x60cm","Sin Luz"],
+    ["Aura","Pulido","180x60cm","LED Blanco"],
+    ["Aura","Pulido","180x60cm","LED Blanco Cálido"],
+    ["Aura","Pulido","180x60cm","LED RGB"],
+    ["Aura","PVC","120x60cm","Sin Luz"],
+    ["Aura","PVC","120x60cm","LED Blanco"],
+    ["Aura","PVC","120x60cm","LED Blanco Cálido"],
+    ["Aura","PVC","120x60cm","LED RGB"],
+    ["Aura","PVC","140x60cm","Sin Luz"],
+    ["Aura","PVC","140x60cm","LED Blanco"],
+    ["Aura","PVC","140x60cm","LED Blanco Cálido"],
+    ["Aura","PVC","140x60cm","LED RGB"],
+    ["Aura","PVC","160x60cm","Sin Luz"],
+    ["Aura","PVC","160x60cm","LED Blanco"],
+    ["Aura","PVC","160x60cm","LED Blanco Cálido"],
+    ["Aura","PVC","160x60cm","LED RGB"],
+    ["Aura","PVC","180x60cm","Sin Luz"],
+    ["Aura","PVC","180x60cm","LED Blanco"],
+    ["Aura","PVC","180x60cm","LED Blanco Cálido"],
+    ["Aura","PVC","180x60cm","LED RGB"],
+    ["Tokyo","Pulido","140x60cm","Sin Luz"],
+    ["Tokyo","Pulido","140x60cm","LED Blanco"],
+    ["Tokyo","Pulido","140x60cm","LED Blanco Cálido"],
+    ["Tokyo","Pulido","140x60cm","LED RGB"],
+    ["Tokyo","Pulido","170x80cm","Sin Luz"],
+    ["Tokyo","Pulido","170x80cm","LED Blanco"],
+    ["Tokyo","Pulido","170x80cm","LED Blanco Cálido"],
+    ["Tokyo","Pulido","170x80cm","LED RGB"],
+    ["Liso","Hierro","150x60cm","Sin Luz"],
+    ["Liso","Hierro","180x80cm","Sin Luz"],
+    ["Viena","Pulido","80x60cm","Sin Luz"],
+    ["Viena","Pulido","80x60cm","LED Blanco"],
+    ["Viena","Pulido","80x60cm","LED Blanco Cálido"],
+    ["Viena","Pulido","80x60cm","LED RGB"],
+    ["Viena","Pulido","150x80cm","Sin Luz"],
+    ["Viena","Pulido","150x80cm","LED Blanco"],
+    ["Viena","Pulido","150x80cm","LED Blanco Cálido"],
+    ["Viena","Pulido","150x80cm","LED RGB"],
+    ["Berlin","Pulido","120x60cm","Neón Frontal + Touch"],
+    ["Berlin","Pulido","140x60cm","Neón Frontal + Touch"],
+    ["Berlin","Pulido","160x60cm","Neón Frontal + Touch"],
+    ["Berlin","Pulido","170x60cm","Neón Frontal + Touch"],
+    ["Berlin","Pulido","180x60cm","Neón Frontal + Touch"],
+    ["Berlin","Pulido","180x70cm","Neón Frontal + Touch"],
+    ["Céntrico","Hierro","150x60cm","Sin Luz"],
+    ["Céntrico","Hierro","180x80cm","Sin Luz"],
+    ["San Francisco","Pulido","120x50cm","Sin Luz"],
+    ["San Francisco","Pulido","120x50cm","LED Blanco"],
+    ["San Francisco","Pulido","120x50cm","LED Blanco Cálido"],
+    ["San Francisco","Pulido","120x50cm","LED RGB"],
+    ["San Francisco","Pulido","140x50cm","Sin Luz"],
+    ["San Francisco","Pulido","140x50cm","LED Blanco"],
+    ["San Francisco","Pulido","140x50cm","LED Blanco Cálido"],
+    ["San Francisco","Pulido","140x50cm","LED RGB"],
+    ["San Francisco","Pulido","170x60cm","Sin Luz"],
+    ["San Francisco","Pulido","170x60cm","LED Blanco"],
+    ["San Francisco","Pulido","170x60cm","LED Blanco Cálido"],
+    ["San Francisco","Pulido","170x60cm","LED RGB"],
+    ["San Francisco","Pulido","180x70cm","Sin Luz"],
+    ["San Francisco","Pulido","180x70cm","LED Blanco"],
+    ["San Francisco","Pulido","180x70cm","LED Blanco Cálido"],
+    ["San Francisco","Pulido","180x70cm","LED RGB"],
+    ["San Francisco","PVC","120x50cm","Sin Luz"],
+    ["San Francisco","PVC","120x50cm","LED Blanco"],
+    ["San Francisco","PVC","120x50cm","LED Blanco Cálido"],
+    ["San Francisco","PVC","120x50cm","LED RGB"],
+    ["San Francisco","PVC","140x50cm","Sin Luz"],
+    ["San Francisco","PVC","140x50cm","LED Blanco"],
+    ["San Francisco","PVC","140x50cm","LED Blanco Cálido"],
+    ["San Francisco","PVC","140x50cm","LED RGB"],
+    ["San Francisco","PVC","170x60cm","Sin Luz"],
+    ["San Francisco","PVC","170x60cm","LED Blanco"],
+    ["San Francisco","PVC","170x60cm","LED Blanco Cálido"],
+    ["San Francisco","PVC","170x60cm","LED RGB"],
+    ["San Francisco","PVC","180x70cm","Sin Luz"],
+    ["San Francisco","PVC","180x70cm","LED Blanco"],
+    ["San Francisco","PVC","180x70cm","LED Blanco Cálido"],
+    ["San Francisco","PVC","180x70cm","LED RGB"],
+    ["Audrey","Pulido","30x20cm","Sin Luz"],
+    ["Dua","Pulido","30x20cm","Sin Luz"],
+    ["Kim","Pulido","Ø 30cm","Sin Luz"],
+    ["Aro","Hierro","Ø 50cm","Sin Luz"],
+    ["Aro","Hierro","Ø 60cm","Sin Luz"],
+    ["Aro","Hierro","Ø 70cm","Sin Luz"],
+    ["Aro","Pulido","Ø 50cm","Sin Luz"],
+    ["Aro","Pulido","Ø 50cm","LED Blanco"],
+    ["Aro","Pulido","Ø 50cm","LED Blanco Cálido"],
+    ["Aro","Pulido","Ø 50cm","LED RGB"],
+    ["Aro","Pulido","Ø 50cm","Neón Frontal + Touch"],
+    ["Aro","Pulido","Ø 60cm","Sin Luz"],
+    ["Aro","Pulido","Ø 60cm","LED Blanco"],
+    ["Aro","Pulido","Ø 60cm","LED Blanco Cálido"],
+    ["Aro","Pulido","Ø 60cm","LED RGB"],
+    ["Aro","Pulido","Ø 60cm","Neón Frontal + Touch"],
+    ["Aro","Pulido","Ø 70cm","Sin Luz"],
+    ["Aro","Pulido","Ø 70cm","LED Blanco"],
+    ["Aro","Pulido","Ø 70cm","LED Blanco Cálido"],
+    ["Aro","Pulido","Ø 70cm","LED RGB"],
+    ["Aro","Pulido","Ø 70cm","Neón Frontal + Touch"],
+    ["Aro","Pulido","Ø 80cm","Sin Luz"],
+    ["Aro","Pulido","Ø 80cm","LED Blanco"],
+    ["Aro","Pulido","Ø 80cm","LED Blanco Cálido"],
+    ["Aro","Pulido","Ø 80cm","LED RGB"],
+    ["Aro","Pulido","Ø 80cm","Neón Frontal + Touch"],
+    ["Aro","Pulido","Ø 90cm","Sin Luz"],
+    ["Aro","Pulido","Ø 90cm","LED Blanco"],
+    ["Aro","Pulido","Ø 90cm","LED Blanco Cálido"],
+    ["Aro","Pulido","Ø 90cm","LED RGB"],
+    ["Aro","Pulido","Ø 90cm","Neón Frontal + Touch"],
+  ];
+
+  const sel = { modelo: null, borde: null, tam: null, luz: null };
+
+  function posibles(campo) {
+    const idx = { modelo: 0, borde: 1, tam: 2, luz: 3 }[campo];
+    return [...new Set(
+      COMBINACIONES.filter(r =>
+        (sel.modelo == null || r[0] === sel.modelo) &&
+        (sel.borde  == null || r[1] === sel.borde)  &&
+        (sel.tam    == null || r[2] === sel.tam)     &&
+        (sel.luz    == null || r[3] === sel.luz)
+      ).map(r => r[idx])
+    )];
+  }
+
+  function valoresUnicos(campo) {
+    const idx = { modelo: 0, borde: 1, tam: 2, luz: 3 }[campo];
+    return [...new Set(COMBINACIONES.map(r => r[idx]))];
+  }
+
+  function renderSeccion(campo, id) {
+    const cont = document.getElementById(id);
+    cont.innerHTML = "";
+    valoresUnicos(campo).forEach(v => {
+      const btn = document.createElement("button");
+      btn.className = "cot-opcion";
+      btn.textContent = v;
+      btn.dataset.campo = campo;
+      btn.dataset.valor = v;
+      btn.addEventListener("click", () => elegir(campo, v));
+      cont.appendChild(btn);
+    });
+  }
+
+  function elegir(campo, valor) {
+    if (campo === "modelo") { sel.borde = null; sel.tam = null; sel.luz = null; }
+    if (campo === "borde")  { sel.tam = null; sel.luz = null; }
+    if (campo === "tam")    { sel.luz = null; }
+    sel[campo] = valor;
+    actualizar();
+  }
+
+  function actualizar() {
+    const campos = ["modelo","borde","tam","luz"];
+    const conts  = { modelo:"opt-modelo", borde:"opt-borde", tam:"opt-tam", luz:"opt-luz" };
+    const secs   = { modelo:"sec-modelo", borde:"sec-borde", tam:"sec-tam", luz:"sec-luz" };
+
+    campos.forEach((campo, i) => {
+      const cont = document.getElementById(conts[campo]);
+      const sec  = document.getElementById(secs[campo]);
+      const posi = posibles(campo);
+      const ant  = campos[i - 1];
+      sec.classList.toggle("bloqueada", i > 0 && sel[ant] == null);
+      cont.querySelectorAll(".cot-opcion").forEach(btn => {
+        btn.classList.toggle("activo", sel[campo] === btn.dataset.valor);
+        btn.disabled = campo === "modelo" ? false : !posi.includes(btn.dataset.valor);
+      });
+    });
+
+    const llenos = campos.filter(c => sel[c]);
+    const resumen = document.getElementById("resumen");
+    const labels = { modelo:"Modelo", borde:"Borde", tam:"Medidas", luz:"Iluminación" };
+
+    resumen.style.display = llenos.length ? "block" : "none";
+    document.getElementById("resumen-filas").innerHTML = llenos.map(c =>
+      `<div class="resumen-fila"><span>${labels[c]}</span><span>${sel[c]}</span></div>`
+    ).join("");
+
+    const btn  = document.getElementById("btn-wa");
+    const nota = document.getElementById("nota");
+    const ok   = campos.every(c => sel[c]);
+    btn.disabled = !ok;
+
+    if (ok) {
+      nota.textContent = "¡Listo! Tocá el botón para abrir WhatsApp.";
+      btn.onclick = () => {
+        const msg = `¡Hola! Quisiera cotizar un espejo personalizado:\n\n` +
+          `• Modelo: ${sel.modelo}\n• Borde: ${sel.borde}\n• Medidas: ${sel.tam}\n• Iluminación: ${sel.luz}\n\n¿Podrían darme un presupuesto? ¡Gracias!`;
+        window.open(`https://wa.me/${NUMERO_WA}?text=${encodeURIComponent(msg)}`, "_blank");
+      };
+    } else {
+      const nombres = { modelo:"el modelo", borde:"el tipo de borde", tam:"las medidas", luz:"la iluminación" };
+      nota.textContent = `Elegí ${nombres[campos.find(c => !sel[c])]} para continuar`;
+    }
+  }
+
+  renderSeccion("modelo","opt-modelo");
+  renderSeccion("borde","opt-borde");
+  renderSeccion("tam","opt-tam");
+  renderSeccion("luz","opt-luz");
+  actualizar();
+  </script>
+
+</body>
+</html>
